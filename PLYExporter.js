@@ -24,7 +24,7 @@ THREE.PLYExporter.prototype = {
 
 		// count the number of vertices
 		var vertexCount = 0;
-		var faces = 0;
+		var faceCount = 0;
 		var vertexList = '';
 		var faceList = '';
 
@@ -77,7 +77,7 @@ THREE.PLYExporter.prototype = {
 							vertex.y = normals.getY( i );
 							vertex.z = normals.getZ( i );
 
-							normal.applyMatrix3( normalMatrixWorld );
+							vertex.applyMatrix3( normalMatrixWorld );
 							
 							line += ' ' +
 								vertex.x + ' ' +
@@ -121,14 +121,14 @@ THREE.PLYExporter.prototype = {
 
 						for ( var i = 0, l = vertices.count; i < l; i += 3 ) {
 
-							faceList += `3 ${ vertexCount } ${ vertexCount + 1 } ${ vertexCount + 2 }\n`
+							faceList += `3 ${ vertexCount + i } ${ vertexCount + i + 1 } ${ vertexCount + i + 2 }\n`
 
 						}
 					
 					}
 
 					vertexCount += vertices.count;
-					faceCount += indices ? indices.length / 3 : vertices.length / 3;
+					faceCount += indices ? indices.count / 3 : vertices.count / 3;
 				}
 			}
 
