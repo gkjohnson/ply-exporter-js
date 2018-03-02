@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/gkjohnson/PLYExporter-js/issues"
   },
-  "homepage": "https://github.com/gkjohnson/PLYExporter-js#readme"
+  "homepage": "https://github.com/gkjohnson/PLYExporter-js#readme",
+  "devDependencies": {
+    "three": "^0.90.0"
+  }
 }
