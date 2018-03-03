@@ -134,7 +134,7 @@ THREE.PLYExporter.prototype = {
 
 							} else {
 
-								line += ' 0 0 0';
+								line += ' 255 255 255';
 
 							}
 
