@@ -74,11 +74,14 @@ THREE.PLYExporter.prototype = {
 
 						vertex.applyMatrix4( mesh.matrixWorld );
 
+
+						// Position information
 						var line =
 							vertex.x + ' ' +
 							vertex.y + ' ' +
 							vertex.z;
 
+						// Normal information
 						if ( includeNormals === true ) {
 
 							if ( normals !== undefined ) {
@@ -102,6 +105,7 @@ THREE.PLYExporter.prototype = {
 
 						}
 
+						// UV information
 						if ( includeUVs === true ) {
 
 							if ( uvs !== undefined ) {
@@ -118,6 +122,7 @@ THREE.PLYExporter.prototype = {
 
 						}
 
+						// Color information
 						if ( includeColors === true ) {
 
 							if ( colors !== undefined ) {
@@ -139,6 +144,8 @@ THREE.PLYExporter.prototype = {
 
 					}
 
+
+					// Create the face list
 					if ( indices !== null ) {
 					
 						for ( i = 0, l = indices.count; i < l; i += 3 ) {
@@ -205,7 +212,7 @@ THREE.PLYExporter.prototype = {
 
 		}
 
-			// faces
+		// faces
 		output += 
 			`element face ${faceCount}\n` +
 			'property list uchar int vertex_index\n' +
