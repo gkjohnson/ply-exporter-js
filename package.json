@@ -1,5 +1,5 @@
 {
-  "name": "plyexporter",
+  "name": "ply-exporter",
   "version": "0.0.1",
   "description": "PLY geometry format exporter for THREE js",
   "main": "PLYExporter.js",
@@ -16,6 +16,17 @@
     "url": "https://github.com/gkjohnson/PLYExporter-js/issues"
   },
   "homepage": "https://github.com/gkjohnson/PLYExporter-js#readme",
+  "keywords": [
+    "javascript",
+    "three",
+    "threejs",
+    "graphics",
+    "geometry",
+    "model",
+    "ply",
+    "export",
+    "exporter"
+  ],
   "devDependencies": {
     "three": "^0.90.0"
   }

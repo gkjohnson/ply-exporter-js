@@ -8,10 +8,10 @@
  *  // second argument is an array of attributes to
  * 	// exclude from the format ('color', 'uv', 'normal')
  *  var data = exporter.parse(mesh, [ 'color' ]);
+ *
+ * Format Definition:
+ *  http://paulbourke.net/dataformats/ply/
  */
-
-// PLY Format Definition
-// http://paulbourke.net/dataformats/ply/
 
 THREE.PLYExporter = function () {};
 
