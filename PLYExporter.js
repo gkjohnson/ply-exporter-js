@@ -18,9 +18,9 @@ THREE.PLYExporter.prototype = {
 
 		}
 
-		var excludeNormals = excludeProperties.indexOf( 'normal' ) !== -1;
-		var excludeColors = excludeProperties.indexOf( 'color' ) !== -1;
-		var excludeUVs = excludeProperties.indexOf( 'uv' ) !== -1;
+		var includeNormals = excludeProperties.indexOf( 'normal' ) === -1;
+		var includeColors = excludeProperties.indexOf( 'color' ) === -1;
+		var includeUVs = excludeProperties.indexOf( 'uv' ) === -1;
 
 		// count the number of vertices
 		var vertexCount = 0;
@@ -44,9 +44,9 @@ THREE.PLYExporter.prototype = {
 				if ( geometry instanceof THREE.BufferGeometry ) {
 
 					var vertices = geometry.getAttribute( 'position' );
-					var normals = excludeNormals === false ? geometry.getAttribute( 'normal' ) : null;
-					var uvs = excludeUVs === false ? geometry.getAttribute( 'uv' ) : null;
-					var colors = excludeColors === false ? geometry.getAttribute( 'color' ) : null;
+					var normals = geometry.getAttribute( 'normal' );
+					var uvs = geometry.getAttribute( 'uv' );
+					var colors = geometry.getAttribute( 'color' );
 					var indices = geometry.getIndex();
 
 					normalMatrixWorld.getNormalMatrix( mesh.matrixWorld );
@@ -71,35 +71,59 @@ THREE.PLYExporter.prototype = {
 							vertex.y + ' ' +
 							vertex.z;
 
-						if ( normals !== null ) {
+						if ( includeNormals === true ) {
 
-							vertex.x = normals.getX( i );
-							vertex.y = normals.getY( i );
-							vertex.z = normals.getZ( i );
+							if ( normals !== undefined ) {
 
-							vertex.applyMatrix3( normalMatrixWorld );
-							
-							line += ' ' +
-								vertex.x + ' ' +
-								vertex.y + ' ' +
-								vertex.z;
+								vertex.x = normals.getX( i );
+								vertex.y = normals.getY( i );
+								vertex.z = normals.getZ( i );
+
+								vertex.applyMatrix3( normalMatrixWorld );
+								
+								line += ' ' +
+									vertex.x + ' ' +
+									vertex.y + ' ' +
+									vertex.z;
+
+							} else {
+
+								line += ' 0 0 0';
+
+							}
 
 						}
 
-						if ( uvs !== null ) {
+						if ( includeUVs === true ) {
 
-							line += ' ' + 
-								uvs.getX( i ) + ' ' +
-								uvs.getY( i );
+							if ( uvs !== undefined ) {
+
+								line += ' ' + 
+									uvs.getX( i ) + ' ' +
+									uvs.getY( i );
+
+							} else if ( includeUVs !== false ) {
+
+								line += ' 0 0';
+
+							}
 
 						}
 
-						if ( colors !== null ) {
+						if ( includeColors === true ) {
 
-							line += ' ' + 
-								Math.floor( colors.getX( i ) * 255 ) + ' ' +
-								Math.floor( colors.getY( i ) * 255 ) + ' ' +
-								Math.floor( colors.getZ( i ) * 255 );
+							if ( colors !== undefined ) {
+
+								line += ' ' + 
+									Math.floor( colors.getX( i ) * 255 ) + ' ' +
+									Math.floor( colors.getY( i ) * 255 ) + ' ' +
+									Math.floor( colors.getZ( i ) * 255 );
+
+							} else {
+
+								line += ' 0 0 0';
+
+							}
 
 						}
 
@@ -144,7 +168,7 @@ THREE.PLYExporter.prototype = {
 			'property float y\n' +
 			'property float z\n';
 
-		if ( excludeNormals !== true ) {
+		if ( includeNormals === true ) {
 
 			// normal
 			output +=
@@ -154,7 +178,7 @@ THREE.PLYExporter.prototype = {
 
 		}
 
-		if ( excludeUVs !== true ) {
+		if ( includeUVs === true ) {
 		
 			// uvs
 			output += 
@@ -163,7 +187,7 @@ THREE.PLYExporter.prototype = {
 
 		}
 
-		if ( excludeColors !== true ) {
+		if ( includeColors === true ) {
 
 			// colors
 			output += 
