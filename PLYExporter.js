@@ -142,23 +142,39 @@ THREE.PLYExporter.prototype = {
 			// position
 			'property float x\n' +
 			'property float y\n' +
-			'property float z\n' +
+			'property float z\n';
+
+		if ( excludeNormals !== true ) {
 
 			// normal
-			'property float nx\n' +
-			'property float ny\n' +
-			'property float nz\n' +
+			output +=
+				'property float nx\n' +
+				'property float ny\n' +
+				'property float nz\n';
 
+		}
+
+		if ( excludeUVs !== true ) {
+		
 			// uvs
-			'property float s\n' +
-			'property float t\n' +
+			output += 
+				'property float s\n' +
+				'property float t\n';
+
+		}
+
+		if ( excludeColors !== true ) {
 
 			// colors
-			'property uchar red\n' +
-			'property uchar green\n' +
-			'property uchar blue\n' +
+			output += 
+				'property uchar red\n' +
+				'property uchar green\n' +
+				'property uchar blue\n';
+
+		}
 
 			// faces
+		output += 
 			`element face ${faceCount}\n` +
 			'property list uchar int vertex_index\n' +
 			'end_header\n' + 
