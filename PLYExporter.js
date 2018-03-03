@@ -1,5 +1,13 @@
 /**
  * @author Garrett Johnson / http://gkjohnson.github.io/
+ * https://github.com/gkjohnson/ply-exporter-js
+ * 
+ * Usage:
+ *  var exporter = new THREE.PLYExporter();
+ *  
+ *  // second argument is an array of attributes to
+ * 	// exclude from the format ('color', 'uv', 'normal')
+ *  var data = exporter.parse(mesh, [ 'color' ]);
  */
 
 // PLY Format Definition
