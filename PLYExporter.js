@@ -6,7 +6,7 @@
  *  var exporter = new THREE.PLYExporter();
  *  
  *  // second argument is an array of attributes to
- * 	// exclude from the format ('color', 'uv', 'normal')
+ *  // exclude from the format ('color', 'uv', 'normal')
  *  var data = exporter.parse(mesh, [ 'color' ]);
  *
  * Format Definition:
