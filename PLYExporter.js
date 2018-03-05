@@ -1,10 +1,10 @@
 /**
  * @author Garrett Johnson / http://gkjohnson.github.io/
  * https://github.com/gkjohnson/ply-exporter-js
- * 
+ *
  * Usage:
  *  var exporter = new THREE.PLYExporter();
- *  
+ *
  *  // second argument is an array of attributes to
  *  // exclude from the format ('color', 'uv', 'normal')
  *  var data = exporter.parse(mesh, [ 'color' ]);
@@ -41,10 +41,11 @@ THREE.PLYExporter.prototype = {
 		object.traverse( function ( child ) {
 
 			if ( child instanceof THREE.Mesh ) {
+        var mesh = child;
 				var geometry = mesh.geometry;
 
 				if ( geometry instanceof THREE.Geometry ) {
-	
+
 					geometry = new THREE.BufferGeometry().setFromObject( mesh );
 
 				}
@@ -58,7 +59,7 @@ THREE.PLYExporter.prototype = {
 					var indices = geometry.getIndex();
 
 					normalMatrixWorld.getNormalMatrix( mesh.matrixWorld );
-					
+
 					if ( vertices === undefined ) {
 
 						return;
@@ -91,7 +92,7 @@ THREE.PLYExporter.prototype = {
 								vertex.z = normals.getZ( i );
 
 								vertex.applyMatrix3( normalMatrixWorld );
-								
+
 								line += ' ' +
 									vertex.x + ' ' +
 									vertex.y + ' ' +
@@ -110,7 +111,7 @@ THREE.PLYExporter.prototype = {
 
 							if ( uvs !== undefined ) {
 
-								line += ' ' + 
+								line += ' ' +
 									uvs.getX( i ) + ' ' +
 									uvs.getY( i );
 
@@ -127,10 +128,10 @@ THREE.PLYExporter.prototype = {
 
 							if ( colors !== undefined ) {
 
-								line += ' ' + 
-									Math.floor( colors.getX( i ) * 255 ) + ' ' +
-									Math.floor( colors.getY( i ) * 255 ) + ' ' +
-									Math.floor( colors.getZ( i ) * 255 );
+								line += ' ' +
+									Math.floor( colors.getX( i ) ) + ' ' +
+									Math.floor( colors.getY( i ) ) + ' ' +
+									Math.floor( colors.getZ( i ) );
 
 							} else {
 
@@ -147,7 +148,7 @@ THREE.PLYExporter.prototype = {
 
 					// Create the face list
 					if ( indices !== null ) {
-					
+
 						for ( i = 0, l = indices.count; i < l; i += 3 ) {
 
 							faceList += `3 ${ indices.getX( i + 0 ) + vertexCount }`
@@ -163,7 +164,7 @@ THREE.PLYExporter.prototype = {
 							faceList += `3 ${ vertexCount + i } ${ vertexCount + i + 1 } ${ vertexCount + i + 2 }\n`
 
 						}
-					
+
 					}
 
 					vertexCount += vertices.count;
@@ -177,7 +178,7 @@ THREE.PLYExporter.prototype = {
 			'ply\n' +
 			'format ascii 1.0\n' +
 			`element vertex ${vertexCount}\n` +
-			
+
 			// position
 			'property float x\n' +
 			'property float y\n' +
@@ -194,9 +195,9 @@ THREE.PLYExporter.prototype = {
 		}
 
 		if ( includeUVs === true ) {
-		
+
 			// uvs
-			output += 
+			output +=
 				'property float s\n' +
 				'property float t\n';
 
@@ -205,7 +206,7 @@ THREE.PLYExporter.prototype = {
 		if ( includeColors === true ) {
 
 			// colors
-			output += 
+			output +=
 				'property uchar red\n' +
 				'property uchar green\n' +
 				'property uchar blue\n';
@@ -213,10 +214,10 @@ THREE.PLYExporter.prototype = {
 		}
 
 		// faces
-		output += 
+		output +=
 			`element face ${faceCount}\n` +
 			'property list uchar int vertex_index\n' +
-			'end_header\n' + 
+			'end_header\n' +
 
 			`${vertexList}\n` +
 			`${faceList}\n`;
