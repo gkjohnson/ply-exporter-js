@@ -20,15 +20,16 @@ THREE.PLYExporter.prototype = {
 	constructor: THREE.PLYExporter,
 
 	parse: function ( object, excludeProperties ) {
-		if ( Array.isArray(excludeProperties) !== true ) {
+
+		if ( Array.isArray( excludeProperties ) !== true ) {
 
 			excludeProperties = [];
 
 		}
 
-		var includeNormals = excludeProperties.indexOf( 'normal' ) === -1;
-		var includeColors = excludeProperties.indexOf( 'color' ) === -1;
-		var includeUVs = excludeProperties.indexOf( 'uv' ) === -1;
+		var includeNormals = excludeProperties.indexOf( 'normal' ) === - 1;
+		var includeColors = excludeProperties.indexOf( 'color' ) === - 1;
+		var includeUVs = excludeProperties.indexOf( 'uv' ) === - 1;
 
 		// count the number of vertices
 		var vertexCount = 0;
@@ -41,6 +42,7 @@ THREE.PLYExporter.prototype = {
 		object.traverse( function ( child ) {
 
 			if ( child instanceof THREE.Mesh ) {
+
 				var mesh = child;
 				var geometry = mesh.geometry;
 
@@ -151,9 +153,9 @@ THREE.PLYExporter.prototype = {
 
 						for ( i = 0, l = indices.count; i < l; i += 3 ) {
 
-							faceList += `3 ${ indices.getX( i + 0 ) + vertexCount }`
-							faceList += ` ${ indices.getX( i + 1 ) + vertexCount }`
-							faceList += ` ${ indices.getX( i + 2 ) + vertexCount }\n`
+							faceList += `3 ${ indices.getX( i + 0 ) + vertexCount }`;
+							faceList += ` ${ indices.getX( i + 1 ) + vertexCount }`;
+							faceList += ` ${ indices.getX( i + 2 ) + vertexCount }\n`;
 
 						}
 
@@ -161,7 +163,7 @@ THREE.PLYExporter.prototype = {
 
 						for ( var i = 0, l = vertices.count; i < l; i += 3 ) {
 
-							faceList += `3 ${ vertexCount + i } ${ vertexCount + i + 1 } ${ vertexCount + i + 2 }\n`
+							faceList += `3 ${ vertexCount + i } ${ vertexCount + i + 1 } ${ vertexCount + i + 2 }\n`;
 
 						}
 
@@ -169,7 +171,9 @@ THREE.PLYExporter.prototype = {
 
 					vertexCount += vertices.count;
 					faceCount += indices ? indices.count / 3 : vertices.count / 3;
+
 				}
+
 			}
 
 		} );
