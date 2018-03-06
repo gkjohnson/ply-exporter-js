@@ -1,6 +1,6 @@
 {
   "name": "ply-exporter",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "PLY geometry format exporter for THREE js",
   "main": "PLYExporter.js",
   "scripts": {
