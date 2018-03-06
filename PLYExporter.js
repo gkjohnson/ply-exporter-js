@@ -41,7 +41,7 @@ THREE.PLYExporter.prototype = {
 		object.traverse( function ( child ) {
 
 			if ( child instanceof THREE.Mesh ) {
-        var mesh = child;
+				var mesh = child;
 				var geometry = mesh.geometry;
 
 				if ( geometry instanceof THREE.Geometry ) {
