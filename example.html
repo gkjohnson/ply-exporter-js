@@ -35,7 +35,7 @@
 
         // process into the file content
         var exp = new THREE.PLYExporter();
-        var data = exp.parse(mesh);
+        var data = exp.parse(mesh, [ 'color' ]);
 
         console.log(data);
 
@@ -47,6 +47,11 @@
 
         // saveData(data, 'sphere.ply');
         
+        console.log(geometry.index.array.join(',') === res.index.array.join(','));
+        console.log(geometry.attributes.position.array.join(',') === res.attributes.position.array.join(','));
+        console.log(geometry.attributes.normal.array.join(',') === res.attributes.normal.array.join(','));
+        console.log(!geometry.attributes.color && !res.attributes.color);
+
     </script>
 </body>
 </html>
