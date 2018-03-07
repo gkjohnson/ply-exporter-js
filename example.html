@@ -4,6 +4,7 @@
     <script type="text/javascript" src="./node_modules/three/build/three.min.js"></script>
     <script type="text/javascript" src="./node_modules/three/examples/js/loaders/PLYLoader.js"></script>
     <script type="text/javascript" src="./PLYExporter.js"></script>
+    <script type="text/javascript" src="./PLYBinaryExporter.js"></script>
 
 
 
@@ -19,7 +20,7 @@
             document.body.appendChild(a);
             a.style = "display: none";
             return function (data, fileName) {
-                var blob = new Blob([data], {type: "octet/stream"}),
+                var blob = new Blob([ data ], { type: "octet/stream" }),
                     url = window.URL.createObjectURL(blob);
                 a.href = url;
                 a.download = fileName;
@@ -37,7 +38,14 @@
         var exp = new THREE.PLYExporter();
         var data = exp.parse(mesh, [ 'color' ]);
 
+        console.log('ASCII Format');
         console.log(data);
+
+        var binexp = new THREE.PLYBinaryExporter();
+        var bindata = binexp.parse(mesh, [ 'color' ]);
+
+        console.log('Binary Format');
+        console.log(new TextDecoder().decode(bindata));
 
         // parse it back to geometry
         var loader = new THREE.PLYLoader();
