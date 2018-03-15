@@ -62,7 +62,7 @@ THREE.PLYBinaryExporter.prototype = {
 		// Form the header
 		var header =
 			'ply\n' +
-			'format binary_little_endian 1.0\n' +
+			'format binary_big_endian 1.0\n' +
 			`element vertex ${vertexCount}\n` +
 
 			// position
