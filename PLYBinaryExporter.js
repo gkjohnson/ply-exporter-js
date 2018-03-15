@@ -102,7 +102,7 @@ THREE.PLYBinaryExporter.prototype = {
 		// faces
 		header +=
 			`element face ${faceCount}\n` +
-			'property list uchar int vertex_index\n' +
+			'property list uchar uint vertex_index\n' +
 			'end_header\n';
 
 		var headerBin = new TextEncoder().encode( header );		
@@ -122,6 +122,7 @@ THREE.PLYBinaryExporter.prototype = {
 
 		var vOffset = headerBin.length;
 		var fOffset = headerBin.length + vertexListLength;
+		var writtenVertices = 0;
 
 		var vertex = new THREE.Vector3();
 		var normalMatrixWorld = new THREE.Matrix3();
@@ -273,13 +274,13 @@ THREE.PLYBinaryExporter.prototype = {
 							output.setUint8( fOffset, 3 );
 							fOffset += 1;
 
-							output.setFloat32( fOffset, indices.getX( i + 0 ) + vertexCount );
+							output.setUint32( fOffset, indices.getX( i + 0 ) + writtenVertices );
 							fOffset += 4;
 
-							output.setFloat32( fOffset, indices.getX( i + 1 ) + vertexCount );
+							output.setUint32( fOffset, indices.getX( i + 1 ) + writtenVertices );
 							fOffset += 4;
 
-							output.setFloat32( fOffset, indices.getX( i + 2 ) + vertexCount );
+							output.setUint32( fOffset, indices.getX( i + 2 ) + writtenVertices );
 							fOffset += 4;
 
 						}
@@ -291,18 +292,23 @@ THREE.PLYBinaryExporter.prototype = {
 							output.setUint8( fOffset, 3 );
 							fOffset += 1;
 
-							output.setFloat32( fOffset, vertexCount + i );
+							output.setUint32( fOffset, writtenVertices + i );
 							fOffset += 4;
 
-							output.setFloat32( fOffset, vertexCount + i + 1 );
+							output.setUint32( fOffset, writtenVertices + i + 1 );
 							fOffset += 4;
 
-							output.setFloat32( fOffset, vertexCount + i + 2 );
+							output.setUint32( fOffset, writtenVertices + i + 2 );
 							fOffset += 4;
 
 						}
 
 					}
+
+
+					// Save the amount of verts we've already written so we can offset
+					// the face index on the next mesh
+					writtenVertices += vertices.count;
 
 				}
 
