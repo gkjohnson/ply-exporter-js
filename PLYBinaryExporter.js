@@ -59,6 +59,24 @@ THREE.PLYBinaryExporter.prototype = {
 
 		})
 
+
+		// get how many bytes will be needed to save out the faces
+		// so we can use a minimal amount of memory / data
+		let indexByteCount = 1;
+
+		if (vertexCount >= Math.pow(2, 8)) { 
+
+			indexByteCount = 2;
+
+		}
+
+		if (vertexCount >= Math.pow(2, 16)) {
+
+			indexByteCount = 4;
+
+		}
+
+
 		// Form the header
 		var header =
 			'ply\n' +
@@ -102,7 +120,7 @@ THREE.PLYBinaryExporter.prototype = {
 		// faces
 		header +=
 			`element face ${faceCount}\n` +
-			'property list uchar uint vertex_index\n' +
+			`property list uchar uint${ indexByteCount * 8 } vertex_index\n` +
 			'end_header\n';
 
 		var headerBin = new TextEncoder().encode( header );		
@@ -265,7 +283,6 @@ THREE.PLYBinaryExporter.prototype = {
 
 					}
 
-
 					// Create the face list
 					if ( indices !== null ) {
 
@@ -274,14 +291,14 @@ THREE.PLYBinaryExporter.prototype = {
 							output.setUint8( fOffset, 3 );
 							fOffset += 1;
 
-							output.setUint32( fOffset, indices.getX( i + 0 ) + writtenVertices );
-							fOffset += 4;
+							output[`setUint${indexByteCount * 8}`]( fOffset, indices.getX( i + 0 ) + writtenVertices );
+							fOffset += indexByteCount;
 
-							output.setUint32( fOffset, indices.getX( i + 1 ) + writtenVertices );
-							fOffset += 4;
+							output[`setUint${indexByteCount * 8}`]( fOffset, indices.getX( i + 1 ) + writtenVertices );
+							fOffset += indexByteCount;
 
-							output.setUint32( fOffset, indices.getX( i + 2 ) + writtenVertices );
-							fOffset += 4;
+							output[`setUint${indexByteCount * 8}`]( fOffset, indices.getX( i + 2 ) + writtenVertices );
+							fOffset += indexByteCount;
 
 						}
 
@@ -292,14 +309,14 @@ THREE.PLYBinaryExporter.prototype = {
 							output.setUint8( fOffset, 3 );
 							fOffset += 1;
 
-							output.setUint32( fOffset, writtenVertices + i );
-							fOffset += 4;
+							output[`setUint${indexByteCount * 8}`]( fOffset, writtenVertices + i );
+							fOffset += indexByteCount;
 
-							output.setUint32( fOffset, writtenVertices + i + 1 );
-							fOffset += 4;
+							output[`setUint${indexByteCount * 8}`]( fOffset, writtenVertices + i + 1 );
+							fOffset += indexByteCount;
 
-							output.setUint32( fOffset, writtenVertices + i + 2 );
-							fOffset += 4;
+							output[`setUint${indexByteCount * 8}`]( fOffset, writtenVertices + i + 2 );
+							fOffset += indexByteCount;
 
 						}
 
