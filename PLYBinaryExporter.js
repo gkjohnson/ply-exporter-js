@@ -62,7 +62,7 @@ THREE.PLYBinaryExporter.prototype = {
 
 		// get how many bytes will be needed to save out the faces
 		// so we can use a minimal amount of memory / data
-		let indexByteCount = 1;
+		var indexByteCount = 1;
 
 		if (vertexCount >= Math.pow(2, 8)) { 
 
@@ -284,6 +284,7 @@ THREE.PLYBinaryExporter.prototype = {
 					}
 
 					// Create the face list
+					var faceIndexFunc = `setUint${indexByteCount * 8}`;
 					if ( indices !== null ) {
 
 						for ( i = 0, l = indices.count; i < l; i += 3 ) {
@@ -291,13 +292,13 @@ THREE.PLYBinaryExporter.prototype = {
 							output.setUint8( fOffset, 3 );
 							fOffset += 1;
 
-							output[`setUint${indexByteCount * 8}`]( fOffset, indices.getX( i + 0 ) + writtenVertices );
+							output[faceIndexFunc]( fOffset, indices.getX( i + 0 ) + writtenVertices );
 							fOffset += indexByteCount;
 
-							output[`setUint${indexByteCount * 8}`]( fOffset, indices.getX( i + 1 ) + writtenVertices );
+							output[faceIndexFunc]( fOffset, indices.getX( i + 1 ) + writtenVertices );
 							fOffset += indexByteCount;
 
-							output[`setUint${indexByteCount * 8}`]( fOffset, indices.getX( i + 2 ) + writtenVertices );
+							output[faceIndexFunc]( fOffset, indices.getX( i + 2 ) + writtenVertices );
 							fOffset += indexByteCount;
 
 						}
@@ -309,13 +310,13 @@ THREE.PLYBinaryExporter.prototype = {
 							output.setUint8( fOffset, 3 );
 							fOffset += 1;
 
-							output[`setUint${indexByteCount * 8}`]( fOffset, writtenVertices + i );
+							output[faceIndexFunc]( fOffset, writtenVertices + i );
 							fOffset += indexByteCount;
 
-							output[`setUint${indexByteCount * 8}`]( fOffset, writtenVertices + i + 1 );
+							output[faceIndexFunc]( fOffset, writtenVertices + i + 1 );
 							fOffset += indexByteCount;
 
-							output[`setUint${indexByteCount * 8}`]( fOffset, writtenVertices + i + 2 );
+							output[faceIndexFunc]( fOffset, writtenVertices + i + 2 );
 							fOffset += indexByteCount;
 
 						}
