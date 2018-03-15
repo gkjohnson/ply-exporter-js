@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gkjohnson/PLYExporter-js.git"
+    "url": "git+https://github.com/gkjohnson/ply-exporter-js.git"
   },
   "author": "Garrett Johnson <garrett.kjohnson@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/gkjohnson/PLYExporter-js/issues"
+    "url": "https://github.com/gkjohnson/ply-exporter-js/issues"
   },
-  "homepage": "https://github.com/gkjohnson/PLYExporter-js#readme",
+  "homepage": "https://github.com/gkjohnson/ply-exporter-js#readme",
   "keywords": [
     "javascript",
     "three",
