@@ -38,12 +38,12 @@ THREE.PLYBinaryExporter.prototype = {
 		object.traverse( function ( child ) {
 
 			if ( child instanceof THREE.Mesh ) {
-				
+
 				if ( geometry instanceof THREE.BufferGeometry ) {
-					
+
 					var vertices = geometry.getAttribute( 'position' );
 					var indices = geometry.getIndex();
-				
+
 					if ( vertices === undefined ) {
 
 						return;
@@ -57,20 +57,20 @@ THREE.PLYBinaryExporter.prototype = {
 
 			}
 
-		})
+		} );
 
 
 		// get how many bytes will be needed to save out the faces
 		// so we can use a minimal amount of memory / data
 		var indexByteCount = 1;
 
-		if (vertexCount >= Math.pow(2, 8)) { 
+		if ( vertexCount >= Math.pow( 2, 8 ) ) {
 
 			indexByteCount = 2;
 
 		}
 
-		if (vertexCount >= Math.pow(2, 16)) {
+		if ( vertexCount >= Math.pow( 2, 16 ) ) {
 
 			indexByteCount = 4;
 
@@ -123,13 +123,13 @@ THREE.PLYBinaryExporter.prototype = {
 			`property list uchar uint${ indexByteCount * 8 } vertex_index\n` +
 			'end_header\n';
 
-		var headerBin = new TextEncoder().encode( header );		
+		var headerBin = new TextEncoder().encode( header );
 
 		// 3 position values at 4 bytes
 		// 3 normal values at 4 bytes
 		// 3 color channels with 1 byte
 		// 2 uv values at 4 bytes
-		var vertexListLength = vertexCount * ( 4 * 3 + ( includeNormals ? 4 * 3 : 0 ) + ( includeColors ?  3 : 0 ) + ( includeUVs ? 4 * 2 : 0 ) );
+		var vertexListLength = vertexCount * ( 4 * 3 + ( includeNormals ? 4 * 3 : 0 ) + ( includeColors ? 3 : 0 ) + ( includeUVs ? 4 * 2 : 0 ) );
 
 		// 1 byte shape desciptor
 		// 3 vertex indices at 4 bytes
@@ -213,7 +213,7 @@ THREE.PLYBinaryExporter.prototype = {
 
 								output.setFloat32( vOffset, vertex.z );
 								vOffset += 4;
-							
+
 							} else {
 
 								output.setFloat32( vOffset, 0 );
@@ -224,7 +224,7 @@ THREE.PLYBinaryExporter.prototype = {
 
 								output.setFloat32( vOffset, 0 );
 								vOffset += 4;
-							
+
 							}
 
 						}
@@ -292,13 +292,13 @@ THREE.PLYBinaryExporter.prototype = {
 							output.setUint8( fOffset, 3 );
 							fOffset += 1;
 
-							output[faceIndexFunc]( fOffset, indices.getX( i + 0 ) + writtenVertices );
+							output[ faceIndexFunc ]( fOffset, indices.getX( i + 0 ) + writtenVertices );
 							fOffset += indexByteCount;
 
-							output[faceIndexFunc]( fOffset, indices.getX( i + 1 ) + writtenVertices );
+							output[ faceIndexFunc ]( fOffset, indices.getX( i + 1 ) + writtenVertices );
 							fOffset += indexByteCount;
 
-							output[faceIndexFunc]( fOffset, indices.getX( i + 2 ) + writtenVertices );
+							output[ faceIndexFunc ]( fOffset, indices.getX( i + 2 ) + writtenVertices );
 							fOffset += indexByteCount;
 
 						}
@@ -310,13 +310,13 @@ THREE.PLYBinaryExporter.prototype = {
 							output.setUint8( fOffset, 3 );
 							fOffset += 1;
 
-							output[faceIndexFunc]( fOffset, writtenVertices + i );
+							output[ faceIndexFunc ]( fOffset, writtenVertices + i );
 							fOffset += indexByteCount;
 
-							output[faceIndexFunc]( fOffset, writtenVertices + i + 1 );
+							output[ faceIndexFunc ]( fOffset, writtenVertices + i + 1 );
 							fOffset += indexByteCount;
 
-							output[faceIndexFunc]( fOffset, writtenVertices + i + 2 );
+							output[ faceIndexFunc ]( fOffset, writtenVertices + i + 2 );
 							fOffset += indexByteCount;
 
 						}
