@@ -132,8 +132,8 @@ THREE.PLYBinaryExporter.prototype = {
 		var vertexListLength = vertexCount * ( 4 * 3 + ( includeNormals ? 4 * 3 : 0 ) + ( includeColors ? 3 : 0 ) + ( includeUVs ? 4 * 2 : 0 ) );
 
 		// 1 byte shape desciptor
-		// 3 vertex indices at 4 bytes
-		var faceListLength = faceCount * ( 4 * 3 + 1 );
+		// 3 vertex indices at ${indexByteCount} bytes
+		var faceListLength = faceCount * ( indexByteCount * 3 + 1 );
 		var output = new DataView( new ArrayBuffer( headerBin.length + vertexListLength + faceListLength ) );
 		new Uint8Array( output.buffer ).set( headerBin, 0 );
 
