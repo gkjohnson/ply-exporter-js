@@ -21,6 +21,7 @@ var dataNoColors = exporter.parse(mesh, ['color']);
 ```
 
 #### PLYExporter.parse(object, excludedAttributes)
+#### PLYBinaryExporter.parse(object, excludedAttributes)
 
 The exporter includes the position, normal, uv, and color attributers by default. If no normal, uv, or color data is present, then an "empty" default is used. `0 0 0` for normals, `0 0` for uvs, and `255 255 255` for colors.
 
