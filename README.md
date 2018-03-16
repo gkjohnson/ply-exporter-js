@@ -29,7 +29,6 @@ To exclude an attribute from being saved, pass it in in the `excludedAttributes`
 
 ## Limitations
 
-- Can only export ascii-formatted data (no binary format support).
 - No ability to export custom attributes.
 - Synchronous.
 - Missing geometry attributes are not automatically excluded.
