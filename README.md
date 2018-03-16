@@ -1,5 +1,5 @@
 # PLY Exporter
-PLY / Stanford Triangle Format exporter for THREE js geometry. Format described [here](http://paulbourke.net/dataformats/ply/).
+PLY / Stanford Triangle Format exporter for THREE js geometry that supports both ascii and binary little endian formats. Format described [here](http://paulbourke.net/dataformats/ply/).
 
 ## Use
 
