@@ -27,6 +27,7 @@ THREE.PLYBinaryExporter.prototype = {
 
 		}
 
+		var geomToBufferGeom = new WeakMap();
 		var includeNormals = excludeProperties.indexOf( 'normal' ) === - 1;
 		var includeColors = excludeProperties.indexOf( 'color' ) === - 1;
 		var includeUVs = excludeProperties.indexOf( 'uv' ) === - 1;
@@ -38,6 +39,17 @@ THREE.PLYBinaryExporter.prototype = {
 		object.traverse( function ( child ) {
 
 			if ( child instanceof THREE.Mesh ) {
+
+				var mesh = child;
+				var geometry = mesh.geometry;
+
+				if ( geometry instanceof THREE.Geometry ) {
+
+					var bufferGeometry = geomToBufferGeom.get(geometry) || new THREE.BufferGeometry().setFromObject( mesh );
+					geomToBufferGeom.set(geometry, bufferGeometry);
+					geometry = bufferGeometry;
+
+				}
 
 				if ( geometry instanceof THREE.BufferGeometry ) {
 
@@ -153,8 +165,7 @@ THREE.PLYBinaryExporter.prototype = {
 
 				if ( geometry instanceof THREE.Geometry ) {
 
-					console.warn( 'PLYBinaryExporter can only export BufferGeometry, skipping Geometry.' );
-					return;
+					geometry = geomToBufferGeom.get(geometry);
 
 				}
 
