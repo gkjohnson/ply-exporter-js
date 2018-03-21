@@ -76,13 +76,13 @@ THREE.PLYBinaryExporter.prototype = {
 		// so we can use a minimal amount of memory / data
 		var indexByteCount = 1;
 
-		if ( vertexCount > 255 ) { // 2^8 bits
+		if ( vertexCount > 256 ) { // 2^8 bits
 
 			indexByteCount = 2;
 
 		}
 
-		if ( vertexCount > 65535 ) { // 2^16 bits
+		if ( vertexCount > 65536 ) { // 2^16 bits
 
 			indexByteCount = 4;
 
