@@ -69,7 +69,7 @@ THREE.PLYExporter.prototype = {
 					}
 
 					// form each line
-					for ( i = 0, l = vertices.count; i < l; i ++ ) {
+					for ( var i = 0, l = vertices.count; i < l; i ++ ) {
 
 						vertex.x = vertices.getX( i );
 						vertex.y = vertices.getY( i );
@@ -151,7 +151,7 @@ THREE.PLYExporter.prototype = {
 					// Create the face list
 					if ( indices !== null ) {
 
-						for ( i = 0, l = indices.count; i < l; i += 3 ) {
+						for ( var i = 0, l = indices.count; i < l; i += 3 ) {
 
 							faceList += `3 ${ indices.getX( i + 0 ) + vertexCount }`;
 							faceList += ` ${ indices.getX( i + 1 ) + vertexCount }`;

@@ -186,7 +186,7 @@ THREE.PLYBinaryExporter.prototype = {
 					}
 
 					// form each line
-					for ( i = 0, l = vertices.count; i < l; i ++ ) {
+					for ( var i = 0, l = vertices.count; i < l; i ++ ) {
 
 						vertex.x = vertices.getX( i );
 						vertex.y = vertices.getY( i );
@@ -298,7 +298,7 @@ THREE.PLYBinaryExporter.prototype = {
 					var faceIndexFunc = `setUint${indexByteCount * 8}`;
 					if ( indices !== null ) {
 
-						for ( i = 0, l = indices.count; i < l; i += 3 ) {
+						for ( var i = 0, l = indices.count; i < l; i += 3 ) {
 
 							output.setUint8( fOffset, 3 );
 							fOffset += 1;
