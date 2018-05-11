@@ -37,3 +37,4 @@ To exclude an attribute from being saved, pass it in in the `excludedAttributes`
 - No ability to export custom attributes.
 - Synchronous.
 - Missing geometry attributes are not automatically excluded.
+- Only triangular meshes can be exported. Points and edges cannot.  
