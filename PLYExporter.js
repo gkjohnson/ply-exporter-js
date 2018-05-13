@@ -76,9 +76,9 @@ THREE.PLYExporter.prototype = {
 
 		} );
 
-		includeNormals = includeNormals && excludeProperties.indexOf( 'normal' ) !== - 1;
-		includeColors = includeColors && excludeProperties.indexOf( 'color' ) !== - 1;
-		includeUVs = includeUVs && excludeProperties.indexOf( 'uv' ) !== - 1;
+		includeNormals = includeNormals && excludeProperties.indexOf( 'normal' ) === - 1;
+		includeColors = includeColors && excludeProperties.indexOf( 'color' ) === - 1;
+		includeUVs = includeUVs && excludeProperties.indexOf( 'uv' ) === - 1;
 
 
 		// count the number of vertices
