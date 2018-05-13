@@ -27,9 +27,60 @@ THREE.PLYExporter.prototype = {
 
 		}
 
-		var includeNormals = excludeProperties.indexOf( 'normal' ) === - 1;
-		var includeColors = excludeProperties.indexOf( 'color' ) === - 1;
-		var includeUVs = excludeProperties.indexOf( 'uv' ) === - 1;
+
+		var geomToBufferGeom = new WeakMap();
+		var includeNormals = false;
+		var includeColors = false;
+		var includeUVs = false;
+		var includeIndices = false;
+
+		object.traverse( function ( child ) {
+
+			if ( child instanceof THREE.Mesh ) {
+
+				var mesh = child;
+				var geometry = mesh.geometry;
+
+				if ( geometry instanceof THREE.Geometry ) {
+
+					var bufferGeometry = geomToBufferGeom.get(geometry) || new THREE.BufferGeometry().setFromObject( mesh );
+					geomToBufferGeom.set(geometry, bufferGeometry);
+					geometry = bufferGeometry;
+
+				}
+
+				if ( geometry instanceof THREE.BufferGeometry ) {
+
+					var vertices = geometry.getAttribute( 'position' );
+					var normals = geometry.getAttribute( 'normal' );
+					var uvs = geometry.getAttribute( 'uv' );
+					var colors = geometry.getAttribute( 'color' );
+					var indices = geometry.getIndex();
+
+					if ( vertices === undefined ) {
+
+						return;
+
+					}
+
+					if ( normals !== undefined ) includeNormals = true;
+
+					if ( uvs !== undefined ) includeUVs = true;
+
+					if ( colors !== undefined ) includeColors = true;
+
+					if ( indices !== undefined ) includeIndices = true;
+
+				}
+
+			}
+
+		} );
+
+		includeNormals = includeNormals && excludeProperties.indexOf( 'normal' ) !== - 1;
+		includeColors = includeColors && excludeProperties.indexOf( 'color' ) !== - 1;
+		includeUVs = includeUVs && excludeProperties.indexOf( 'uv' ) !== - 1;
+
 
 		// count the number of vertices
 		var vertexCount = 0;
@@ -48,7 +99,7 @@ THREE.PLYExporter.prototype = {
 
 				if ( geometry instanceof THREE.Geometry ) {
 
-					geometry = new THREE.BufferGeometry().setFromObject( mesh );
+					geometry = geomToBufferGeom.get( geometry );
 
 				}
 
@@ -147,30 +198,34 @@ THREE.PLYExporter.prototype = {
 
 					}
 
-
 					// Create the face list
-					if ( indices !== null ) {
+					if ( includeIndices === true ) {
 
-						for ( var i = 0, l = indices.count; i < l; i += 3 ) {
+						if ( indices !== null ) {
 
-							faceList += `3 ${ indices.getX( i + 0 ) + vertexCount }`;
-							faceList += ` ${ indices.getX( i + 1 ) + vertexCount }`;
-							faceList += ` ${ indices.getX( i + 2 ) + vertexCount }\n`;
+							for ( var i = 0, l = indices.count; i < l; i += 3 ) {
+
+								faceList += `3 ${ indices.getX( i + 0 ) + vertexCount }`;
+								faceList += ` ${ indices.getX( i + 1 ) + vertexCount }`;
+								faceList += ` ${ indices.getX( i + 2 ) + vertexCount }\n`;
+
+							}
+
+						} else {
+
+							for ( var i = 0, l = vertices.count; i < l; i += 3 ) {
+
+								faceList += `3 ${ vertexCount + i } ${ vertexCount + i + 1 } ${ vertexCount + i + 2 }\n`;
+
+							}
 
 						}
 
-					} else {
-
-						for ( var i = 0, l = vertices.count; i < l; i += 3 ) {
-
-							faceList += `3 ${ vertexCount + i } ${ vertexCount + i + 1 } ${ vertexCount + i + 2 }\n`;
-
-						}
+						faceCount += indices ? indices.count / 3 : vertices.count / 3;
 
 					}
 
 					vertexCount += vertices.count;
-					faceCount += indices ? indices.count / 3 : vertices.count / 3;
 
 				}
 
@@ -217,14 +272,19 @@ THREE.PLYExporter.prototype = {
 
 		}
 
-		// faces
-		output +=
-			`element face ${faceCount}\n` +
-			'property list uchar int vertex_index\n' +
-			'end_header\n' +
+		if ( includeIndices === true ) {
 
+			// faces
+			output +=
+				`element face ${faceCount}\n` +
+				'property list uchar int vertex_index\n';
+
+		}
+
+		output +=
+			'end_header\n' +
 			`${vertexList}\n` +
-			`${faceList}\n`;
+			(includeIndices ? `${faceList}\n` : '');
 
 		return output;
 
