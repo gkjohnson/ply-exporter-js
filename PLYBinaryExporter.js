@@ -46,8 +46,8 @@ THREE.PLYBinaryExporter.prototype = {
 
 				if ( geometry instanceof THREE.Geometry ) {
 
-					var bufferGeometry = geomToBufferGeom.get(geometry) || new THREE.BufferGeometry().setFromObject( mesh );
-					geomToBufferGeom.set(geometry, bufferGeometry);
+					var bufferGeometry = geomToBufferGeom.get( geometry ) || new THREE.BufferGeometry().setFromObject( mesh );
+					geomToBufferGeom.set( geometry, bufferGeometry );
 					geometry = bufferGeometry;
 
 				}

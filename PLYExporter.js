@@ -43,8 +43,8 @@ THREE.PLYExporter.prototype = {
 
 				if ( geometry instanceof THREE.Geometry ) {
 
-					var bufferGeometry = geomToBufferGeom.get(geometry) || new THREE.BufferGeometry().setFromObject( mesh );
-					geomToBufferGeom.set(geometry, bufferGeometry);
+					var bufferGeometry = geomToBufferGeom.get( geometry ) || new THREE.BufferGeometry().setFromObject( mesh );
+					geomToBufferGeom.set( geometry, bufferGeometry );
 					geometry = bufferGeometry;
 
 				}
@@ -284,7 +284,7 @@ THREE.PLYExporter.prototype = {
 		output +=
 			'end_header\n' +
 			`${vertexList}\n` +
-			(includeIndices ? `${faceList}\n` : '');
+			( includeIndices ? `${faceList}\n` : '' );
 
 		return output;
 
