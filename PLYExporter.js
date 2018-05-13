@@ -4,7 +4,10 @@
  *
  * Usage:
  *  var exporter = new THREE.PLYExporter();
- *  var data = exporter.parse( mesh );
+ *
+ *  // second argument is an array of attributes to
+ *  // exclude from the format ('color', 'uv', 'normal')
+ *  var data = exporter.parse(mesh, [ 'color' ]);
  *
  * Format Definition:
  *  http://paulbourke.net/dataformats/ply/
@@ -16,7 +19,13 @@ THREE.PLYExporter.prototype = {
 
 	constructor: THREE.PLYExporter,
 
-	parse: function ( object ) {
+	parse: function ( object, excludeProperties ) {
+
+		if ( Array.isArray( excludeProperties ) !== true ) {
+
+			excludeProperties = [];
+
+		}
 
 		var geomToBufferGeom = new WeakMap();
 		var includeNormals = false;
@@ -66,6 +75,11 @@ THREE.PLYExporter.prototype = {
 			}
 
 		} );
+
+		includeNormals = includeNormals && excludeProperties.indexOf( 'normal' ) !== - 1;
+		includeColors = includeColors && excludeProperties.indexOf( 'color' ) !== - 1;
+		includeUVs = includeUVs && excludeProperties.indexOf( 'uv' ) !== - 1;
+
 
 		// count the number of vertices
 		var vertexCount = 0;
