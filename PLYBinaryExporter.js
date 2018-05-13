@@ -60,7 +60,7 @@ THREE.PLYBinaryExporter.prototype = {
 					var colors = geometry.getAttribute( 'color' );
 					var indices = geometry.getIndex();
 
-					if ( vertices === undefined ) {
+					if ( vertices == null ) {
 
 						return;
 
@@ -69,13 +69,13 @@ THREE.PLYBinaryExporter.prototype = {
 					vertexCount += vertices.count;
 					faceCount += indices ? indices.count / 3 : vertices.count / 3;
 
-					if ( normals !== undefined ) includeNormals = true;
+					if ( normals != null ) includeNormals = true;
 
-					if ( uvs !== undefined ) includeUVs = true;
+					if ( uvs != null ) includeUVs = true;
 
-					if ( colors !== undefined ) includeColors = true;
+					if ( colors != null ) includeColors = true;
 
-					if ( indices !== undefined ) includeIndices = true;
+					if ( indices != null ) includeIndices = true;
 
 				}
 
@@ -219,7 +219,7 @@ THREE.PLYBinaryExporter.prototype = {
 
 					normalMatrixWorld.getNormalMatrix( mesh.matrixWorld );
 
-					if ( vertices === undefined ) {
+					if ( vertices == null ) {
 
 						return;
 
@@ -248,7 +248,7 @@ THREE.PLYBinaryExporter.prototype = {
 						// Normal information
 						if ( includeNormals === true ) {
 
-							if ( normals !== undefined ) {
+							if ( normals != null ) {
 
 								vertex.x = normals.getX( i );
 								vertex.y = normals.getY( i );
@@ -283,7 +283,7 @@ THREE.PLYBinaryExporter.prototype = {
 						// UV information
 						if ( includeUVs === true ) {
 
-							if ( uvs !== undefined ) {
+							if ( uvs != null ) {
 
 								output.setFloat32( vOffset, uvs.getX( i ) );
 								vOffset += 4;
@@ -306,7 +306,7 @@ THREE.PLYBinaryExporter.prototype = {
 						// Color information
 						if ( includeColors === true ) {
 
-							if ( colors !== undefined ) {
+							if ( colors != null ) {
 
 								output.setUint8( vOffset, colors.getX( i ) );
 								vOffset += 1;
