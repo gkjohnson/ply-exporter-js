@@ -4,10 +4,7 @@
  *
  * Usage:
  *  var exporter = new THREE.PLYBinaryExporter();
- *
- *  // second argument is an array of attributes to
- *  // exclude from the format ('color', 'uv', 'normal')
- *  var data = exporter.parse(mesh, [ 'color' ]);
+ *  var data = exporter.parse( mesh );
  *
  * Format Definition:
  *  http://paulbourke.net/dataformats/ply/
@@ -19,13 +16,7 @@ THREE.PLYBinaryExporter.prototype = {
 
 	constructor: THREE.PLYBinaryExporter,
 
-	parse: function ( object, excludeProperties ) {
-
-		if ( Array.isArray( excludeProperties ) !== true ) {
-
-			excludeProperties = [];
-
-		}
+	parse: function ( object ) {
 
 		var geomToBufferGeom = new WeakMap();
 		var includeNormals = false;
@@ -83,9 +74,23 @@ THREE.PLYBinaryExporter.prototype = {
 
 		} );
 
-		includeNormals = includeNormals && excludeProperties.indexOf( 'normal' ) !== - 1;
-		includeColors = includeColors && excludeProperties.indexOf( 'color' ) !== - 1;
-		includeUVs = includeUVs && excludeProperties.indexOf( 'uv' ) !== - 1;
+
+		if ( includeIndices && faceCount !== Math.floor( faceCount ) ) {
+
+			// point cloud meshes will not have an index array and may not have a
+			// number of vertices that is divisble by 3 (and therefore representable
+			// as triangles)
+			console.error(
+				
+				'PLYExporter: Failed to generate a valid PLY file because the ' +
+				'number of faces is not divisible by 3. This can be caused by ' +
+				'exporting a mix of triangle and non-triangle mesh types.'
+
+			);
+
+			return null;
+
+		}
 
 
 		// get how many bytes will be needed to save out the faces
