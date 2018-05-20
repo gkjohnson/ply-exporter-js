@@ -28,9 +28,10 @@ THREE.PLYBinaryExporter.prototype = {
 		}
 
 		var geomToBufferGeom = new WeakMap();
-		var includeNormals = excludeProperties.indexOf( 'normal' ) === - 1;
-		var includeColors = excludeProperties.indexOf( 'color' ) === - 1;
-		var includeUVs = excludeProperties.indexOf( 'uv' ) === - 1;
+		var includeNormals = false;
+		var includeColors = false;
+		var includeUVs = false;
+		var includeIndices = true;
 
 		// count the number of vertices
 		var vertexCount = 0;
@@ -45,8 +46,8 @@ THREE.PLYBinaryExporter.prototype = {
 
 				if ( geometry instanceof THREE.Geometry ) {
 
-					var bufferGeometry = geomToBufferGeom.get(geometry) || new THREE.BufferGeometry().setFromObject( mesh );
-					geomToBufferGeom.set(geometry, bufferGeometry);
+					var bufferGeometry = geomToBufferGeom.get( geometry ) || new THREE.BufferGeometry().setFromObject( mesh );
+					geomToBufferGeom.set( geometry, bufferGeometry );
 					geometry = bufferGeometry;
 
 				}
@@ -54,9 +55,12 @@ THREE.PLYBinaryExporter.prototype = {
 				if ( geometry instanceof THREE.BufferGeometry ) {
 
 					var vertices = geometry.getAttribute( 'position' );
+					var normals = geometry.getAttribute( 'normal' );
+					var uvs = geometry.getAttribute( 'uv' );
+					var colors = geometry.getAttribute( 'color' );
 					var indices = geometry.getIndex();
 
-					if ( vertices === undefined ) {
+					if ( vertices == null ) {
 
 						return;
 
@@ -65,11 +69,39 @@ THREE.PLYBinaryExporter.prototype = {
 					vertexCount += vertices.count;
 					faceCount += indices ? indices.count / 3 : vertices.count / 3;
 
+					if ( normals != null ) includeNormals = true;
+
+					if ( uvs != null ) includeUVs = true;
+
+					if ( colors != null ) includeColors = true;
+
 				}
 
 			}
 
 		} );
+
+		includeNormals = includeNormals && excludeProperties.indexOf( 'normal' ) === - 1;
+		includeColors = includeColors && excludeProperties.indexOf( 'color' ) === - 1;
+		includeUVs = includeUVs && excludeProperties.indexOf( 'uv' ) === - 1;
+		includeIndices = includeIndices && excludeProperties.indexOf( 'index' ) === - 1;
+
+		if ( includeIndices && faceCount !== Math.floor( faceCount ) ) {
+
+			// point cloud meshes will not have an index array and may not have a
+			// number of vertices that is divisble by 3 (and therefore representable
+			// as triangles)
+			console.error(
+				
+				'PLYExporter: Failed to generate a valid PLY file because the ' +
+				'number of faces is not divisible by 3. This can be caused by ' +
+				'exporting a mix of triangle and non-triangle mesh types.'
+
+			);
+
+			return null;
+
+		}
 
 
 		// get how many bytes will be needed to save out the faces
@@ -129,11 +161,17 @@ THREE.PLYBinaryExporter.prototype = {
 
 		}
 
-		// faces
-		header +=
-			`element face ${faceCount}\n` +
-			`property list uchar uint${ indexByteCount * 8 } vertex_index\n` +
-			'end_header\n';
+		if ( includeIndices === true ) {
+
+			// faces
+			header +=
+				`element face ${faceCount}\n` +
+				`property list uchar uint${ indexByteCount * 8 } vertex_index\n`;
+
+		}
+
+		header += 'end_header\n';
+
 
 		var headerBin = new TextEncoder().encode( header );
 
@@ -145,7 +183,7 @@ THREE.PLYBinaryExporter.prototype = {
 
 		// 1 byte shape desciptor
 		// 3 vertex indices at ${indexByteCount} bytes
-		var faceListLength = faceCount * ( indexByteCount * 3 + 1 );
+		var faceListLength = includeIndices ? faceCount * ( indexByteCount * 3 + 1 ) : 0;
 		var output = new DataView( new ArrayBuffer( headerBin.length + vertexListLength + faceListLength ) );
 		new Uint8Array( output.buffer ).set( headerBin, 0 );
 
@@ -165,7 +203,7 @@ THREE.PLYBinaryExporter.prototype = {
 
 				if ( geometry instanceof THREE.Geometry ) {
 
-					geometry = geomToBufferGeom.get(geometry);
+					geometry = geomToBufferGeom.get( geometry );
 
 				}
 
@@ -179,7 +217,7 @@ THREE.PLYBinaryExporter.prototype = {
 
 					normalMatrixWorld.getNormalMatrix( mesh.matrixWorld );
 
-					if ( vertices === undefined ) {
+					if ( vertices == null ) {
 
 						return;
 
@@ -208,7 +246,7 @@ THREE.PLYBinaryExporter.prototype = {
 						// Normal information
 						if ( includeNormals === true ) {
 
-							if ( normals !== undefined ) {
+							if ( normals != null ) {
 
 								vertex.x = normals.getX( i );
 								vertex.y = normals.getY( i );
@@ -243,7 +281,7 @@ THREE.PLYBinaryExporter.prototype = {
 						// UV information
 						if ( includeUVs === true ) {
 
-							if ( uvs !== undefined ) {
+							if ( uvs != null ) {
 
 								output.setFloat32( vOffset, uvs.getX( i ) );
 								vOffset += 4;
@@ -266,15 +304,15 @@ THREE.PLYBinaryExporter.prototype = {
 						// Color information
 						if ( includeColors === true ) {
 
-							if ( colors !== undefined ) {
+							if ( colors != null ) {
 
-								output.setUint8( vOffset, colors.getX( i ) );
+								output.setUint8( vOffset, Math.floor( colors.getX( i ) * 255 ) );
 								vOffset += 1;
 
-								output.setUint8( vOffset, colors.getY( i ) );
+								output.setUint8( vOffset, Math.floor( colors.getY( i ) * 255 ) );
 								vOffset += 1;
 
-								output.setUint8( vOffset, colors.getZ( i ) );
+								output.setUint8( vOffset, Math.floor( colors.getZ( i ) * 255 ) );
 								vOffset += 1;
 
 							} else {
@@ -294,41 +332,45 @@ THREE.PLYBinaryExporter.prototype = {
 
 					}
 
-					// Create the face list
-					var faceIndexFunc = `setUint${indexByteCount * 8}`;
-					if ( indices !== null ) {
+					if ( includeIndices === true ) {
 
-						for ( var i = 0, l = indices.count; i < l; i += 3 ) {
+						// Create the face list
+						var faceIndexFunc = `setUint${indexByteCount * 8}`;
+						if ( indices !== null ) {
 
-							output.setUint8( fOffset, 3 );
-							fOffset += 1;
+							for ( var i = 0, l = indices.count; i < l; i += 3 ) {
 
-							output[ faceIndexFunc ]( fOffset, indices.getX( i + 0 ) + writtenVertices );
-							fOffset += indexByteCount;
+								output.setUint8( fOffset, 3 );
+								fOffset += 1;
 
-							output[ faceIndexFunc ]( fOffset, indices.getX( i + 1 ) + writtenVertices );
-							fOffset += indexByteCount;
+								output[ faceIndexFunc ]( fOffset, indices.getX( i + 0 ) + writtenVertices );
+								fOffset += indexByteCount;
 
-							output[ faceIndexFunc ]( fOffset, indices.getX( i + 2 ) + writtenVertices );
-							fOffset += indexByteCount;
+								output[ faceIndexFunc ]( fOffset, indices.getX( i + 1 ) + writtenVertices );
+								fOffset += indexByteCount;
 
-						}
+								output[ faceIndexFunc ]( fOffset, indices.getX( i + 2 ) + writtenVertices );
+								fOffset += indexByteCount;
 
-					} else {
+							}
 
-						for ( var i = 0, l = vertices.count; i < l; i += 3 ) {
+						} else {
 
-							output.setUint8( fOffset, 3 );
-							fOffset += 1;
+							for ( var i = 0, l = vertices.count; i < l; i += 3 ) {
 
-							output[ faceIndexFunc ]( fOffset, writtenVertices + i );
-							fOffset += indexByteCount;
+								output.setUint8( fOffset, 3 );
+								fOffset += 1;
 
-							output[ faceIndexFunc ]( fOffset, writtenVertices + i + 1 );
-							fOffset += indexByteCount;
+								output[ faceIndexFunc ]( fOffset, writtenVertices + i );
+								fOffset += indexByteCount;
 
-							output[ faceIndexFunc ]( fOffset, writtenVertices + i + 2 );
-							fOffset += indexByteCount;
+								output[ faceIndexFunc ]( fOffset, writtenVertices + i + 1 );
+								fOffset += indexByteCount;
+
+								output[ faceIndexFunc ]( fOffset, writtenVertices + i + 2 );
+								fOffset += indexByteCount;
+
+							}
 
 						}
 

@@ -39,7 +39,7 @@
 
 
         // process into the ASCII file format
-        var data = exp.parse(mesh, [ 'color' ]);
+        var data = exp.parse(mesh);
         console.log('ASCII Format', { data });
 
         // parse it back to geometry and compare
@@ -53,7 +53,7 @@
 
         // process into the Binary file format
         var binexp = new THREE.PLYBinaryExporter();
-        var bindata = binexp.parse(mesh, [ 'color' ]);
+        var bindata = binexp.parse(mesh);
 
         console.log('Binary Format', { data: new TextDecoder().decode(bindata) });
 
