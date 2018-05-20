@@ -87,7 +87,6 @@ THREE.PLYBinaryExporter.prototype = {
 		includeColors = includeColors && excludeProperties.indexOf( 'color' ) === - 1;
 		includeUVs = includeUVs && excludeProperties.indexOf( 'uv' ) === - 1;
 
-
 		if ( includeIndices && faceCount !== Math.floor( faceCount ) ) {
 
 			// point cloud meshes will not have an index array and may not have a
@@ -308,13 +307,13 @@ THREE.PLYBinaryExporter.prototype = {
 
 							if ( colors != null ) {
 
-								output.setUint8( vOffset, colors.getX( i ) );
+								output.setUint8( vOffset, Math.floor( colors.getX( i ) * 255 ) );
 								vOffset += 1;
 
-								output.setUint8( vOffset, colors.getY( i ) );
+								output.setUint8( vOffset, Math.floor( colors.getY( i ) * 255 ) );
 								vOffset += 1;
 
-								output.setUint8( vOffset, colors.getZ( i ) );
+								output.setUint8( vOffset, Math.floor( colors.getZ( i ) * 255 ) );
 								vOffset += 1;
 
 							} else {

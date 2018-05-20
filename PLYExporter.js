@@ -182,9 +182,9 @@ THREE.PLYExporter.prototype = {
 							if ( colors != null ) {
 
 								line += ' ' +
-									Math.floor( colors.getX( i ) ) + ' ' +
-									Math.floor( colors.getY( i ) ) + ' ' +
-									Math.floor( colors.getZ( i ) );
+									Math.floor( colors.getX( i ) * 255 ) + ' ' +
+									Math.floor( colors.getY( i ) * 255 ) + ' ' +
+									Math.floor( colors.getZ( i ) * 255 );
 
 							} else {
 
