@@ -239,7 +239,7 @@ THREE.PLYExporter.prototype = {
 			// number of vertices that is divisble by 3 (and therefore representable
 			// as triangles)
 			console.error(
-				
+
 				'PLYExporter: Failed to generate a valid PLY file because the ' +
 				'number of faces is not divisible by 3. This can be caused by ' +
 				'exporting a mix of triangle and non-triangle mesh types.'
