@@ -31,7 +31,7 @@ THREE.PLYBinaryExporter.prototype = {
 		var includeNormals = false;
 		var includeColors = false;
 		var includeUVs = false;
-		var includeIndices = false;
+		var includeIndices = true;
 
 		// count the number of vertices
 		var vertexCount = 0;
@@ -75,8 +75,6 @@ THREE.PLYBinaryExporter.prototype = {
 
 					if ( colors != null ) includeColors = true;
 
-					if ( indices != null ) includeIndices = true;
-
 				}
 
 			}
@@ -86,6 +84,7 @@ THREE.PLYBinaryExporter.prototype = {
 		includeNormals = includeNormals && excludeProperties.indexOf( 'normal' ) === - 1;
 		includeColors = includeColors && excludeProperties.indexOf( 'color' ) === - 1;
 		includeUVs = includeUVs && excludeProperties.indexOf( 'uv' ) === - 1;
+		includeIndices = includeIndices && excludeProperties.indexOf( 'index' ) === - 1;
 
 		if ( includeIndices && faceCount !== Math.floor( faceCount ) ) {
 

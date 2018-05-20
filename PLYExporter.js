@@ -31,7 +31,7 @@ THREE.PLYExporter.prototype = {
 		var includeNormals = false;
 		var includeColors = false;
 		var includeUVs = false;
-		var includeIndices = false;
+		var includeIndices = true;
 
 		object.traverse( function ( child ) {
 
@@ -69,8 +69,6 @@ THREE.PLYExporter.prototype = {
 
 					if ( colors != null ) includeColors = true;
 
-					if ( indices != null ) includeIndices = true;
-
 				}
 
 			}
@@ -80,6 +78,7 @@ THREE.PLYExporter.prototype = {
 		includeNormals = includeNormals && excludeProperties.indexOf( 'normal' ) === - 1;
 		includeColors = includeColors && excludeProperties.indexOf( 'color' ) === - 1;
 		includeUVs = includeUVs && excludeProperties.indexOf( 'uv' ) === - 1;
+		includeIndices = includeIndices && excludeProperties.indexOf( 'index' ) === - 1;
 
 
 		// count the number of vertices
