@@ -36,6 +36,10 @@ THREE.PLYExporter.prototype = {
 		var includeUVs = false;
 		var includeIndices = true;
 
+		// count the number of vertices
+		var vertexCount = 0;
+		var faceCount = 0;
+
 		object.traverse( function ( child ) {
 
 			if ( child instanceof THREE.Mesh ) {
@@ -65,6 +69,8 @@ THREE.PLYExporter.prototype = {
 
 					}
 
+					vertexCount += vertices.count;
+					faceCount += indices ? indices.count / 3 : vertices.count / 3;
 
 					if ( normals != null ) includeNormals = true;
 
@@ -84,9 +90,93 @@ THREE.PLYExporter.prototype = {
 		includeIndices = includeIndices && excludeProperties.indexOf( 'index' ) === - 1;
 
 
+		if ( includeIndices && faceCount !== Math.floor( faceCount ) ) {
+
+			// point cloud meshes will not have an index array and may not have a
+			// number of vertices that is divisble by 3 (and therefore representable
+			// as triangles)
+			console.error(
+
+				'PLYExporter: Failed to generate a valid PLY file with triangle indices because the ' +
+				'number of indices is not divisible by 3.'
+
+			);
+
+			return null;
+
+		}
+
+		// get how many bytes will be needed to save out the faces
+		// so we can use a minimal amount of memory / data
+		var indexByteCount = 1;
+
+		if ( vertexCount > 256 ) { // 2^8 bits
+
+			indexByteCount = 2;
+
+		}
+
+		if ( vertexCount > 65536 ) { // 2^16 bits
+
+			indexByteCount = 4;
+
+		}
+
+
+		var header =
+			'ply\n' +
+			`format ${ options.binary ? 'binary_big_endian' : 'ascii' } 1.0\n` +
+			`element vertex ${vertexCount}\n` +
+
+			// position
+			'property float x\n' +
+			'property float y\n' +
+			'property float z\n';
+
+		if ( includeNormals === true ) {
+
+			// normal
+			header +=
+				'property float nx\n' +
+				'property float ny\n' +
+				'property float nz\n';
+
+		}
+
+		if ( includeUVs === true ) {
+
+			// uvs
+			header +=
+				'property float s\n' +
+				'property float t\n';
+
+		}
+
+		if ( includeColors === true ) {
+
+			// colors
+			header +=
+				'property uchar red\n' +
+				'property uchar green\n' +
+				'property uchar blue\n';
+
+		}
+
+		if ( includeIndices === true ) {
+
+			// faces
+			header +=
+				`element face ${faceCount}\n` +
+				`property list uchar uint${ indexByteCount * 8 } vertex_index\n`;
+
+		}
+
+		header += 'end_header\n';
+
+
 		// count the number of vertices
-		var vertexCount = 0;
-		var faceCount = 0;
+		// TODO: Handle the binary and ascii cases
+		var writtenVertices = 0;
 		var vertexList = '';
 		var faceList = '';
 
@@ -207,9 +297,9 @@ THREE.PLYExporter.prototype = {
 
 							for ( var i = 0, l = indices.count; i < l; i += 3 ) {
 
-								faceList += `3 ${ indices.getX( i + 0 ) + vertexCount }`;
-								faceList += ` ${ indices.getX( i + 1 ) + vertexCount }`;
-								faceList += ` ${ indices.getX( i + 2 ) + vertexCount }\n`;
+								faceList += `3 ${ indices.getX( i + 0 ) + writtenVertices }`;
+								faceList += ` ${ indices.getX( i + 1 ) + writtenVertices }`;
+								faceList += ` ${ indices.getX( i + 2 ) + writtenVertices }\n`;
 
 							}
 
@@ -217,7 +307,7 @@ THREE.PLYExporter.prototype = {
 
 							for ( var i = 0, l = vertices.count; i < l; i += 3 ) {
 
-								faceList += `3 ${ vertexCount + i } ${ vertexCount + i + 1 } ${ vertexCount + i + 2 }\n`;
+								faceList += `3 ${ writtenVertices + i } ${ writtenVertices + i + 1 } ${ writtenVertices + i + 2 }\n`;
 
 							}
 
@@ -227,79 +317,13 @@ THREE.PLYExporter.prototype = {
 
 					}
 
-					vertexCount += vertices.count;
+					writtenVertices += vertices.count;
 
 				}
 
 			}
 
 		} );
-
-		if ( includeIndices && faceCount !== Math.floor( faceCount ) ) {
-
-			// point cloud meshes will not have an index array and may not have a
-			// number of vertices that is divisble by 3 (and therefore representable
-			// as triangles)
-			console.error(
-
-				'PLYExporter: Failed to generate a valid PLY file with triangle indices because the ' +
-				'number of indices is not divisible by 3.'
-
-			);
-
-			return null;
-
-		}
-
-		var header =
-			'ply\n' +
-			'format ascii 1.0\n' +
-			`element vertex ${vertexCount}\n` +
-
-			// position
-			'property float x\n' +
-			'property float y\n' +
-			'property float z\n';
-
-		if ( includeNormals === true ) {
-
-			// normal
-			header +=
-				'property float nx\n' +
-				'property float ny\n' +
-				'property float nz\n';
-
-		}
-
-		if ( includeUVs === true ) {
-
-			// uvs
-			header +=
-				'property float s\n' +
-				'property float t\n';
-
-		}
-
-		if ( includeColors === true ) {
-
-			// colors
-			header +=
-				'property uchar red\n' +
-				'property uchar green\n' +
-				'property uchar blue\n';
-
-		}
-
-		if ( includeIndices === true ) {
-
-			// faces
-			header +=
-				`element face ${faceCount}\n` +
-				'property list uchar int vertex_index\n';
-
-		}
-
-		output += 'end_header\n';
 
 		var output =
 			header +
