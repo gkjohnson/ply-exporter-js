@@ -20,14 +20,16 @@ THREE.PLYExporter.prototype = {
 
 	constructor: THREE.PLYExporter,
 
-	parse: function ( object, excludeProperties ) {
+	parse: function ( object, options ) {
 
-		if ( Array.isArray( excludeProperties ) !== true ) {
+		var defaultOptions = {
+			binary: false,
+			excludeProperties: []
+		};
 
-			excludeProperties = [];
+		options = Object.assign( defaultOptions, options );
 
-		}
-
+		var excludeProperties = options.excludeProperties;
 		var geomToBufferGeom = new WeakMap();
 		var includeNormals = false;
 		var includeColors = false;
@@ -249,7 +251,7 @@ THREE.PLYExporter.prototype = {
 
 		}
 
-		var output =
+		var header =
 			'ply\n' +
 			'format ascii 1.0\n' +
 			`element vertex ${vertexCount}\n` +
@@ -262,7 +264,7 @@ THREE.PLYExporter.prototype = {
 		if ( includeNormals === true ) {
 
 			// normal
-			output +=
+			header +=
 				'property float nx\n' +
 				'property float ny\n' +
 				'property float nz\n';
@@ -272,7 +274,7 @@ THREE.PLYExporter.prototype = {
 		if ( includeUVs === true ) {
 
 			// uvs
-			output +=
+			header +=
 				'property float s\n' +
 				'property float t\n';
 
@@ -281,7 +283,7 @@ THREE.PLYExporter.prototype = {
 		if ( includeColors === true ) {
 
 			// colors
-			output +=
+			header +=
 				'property uchar red\n' +
 				'property uchar green\n' +
 				'property uchar blue\n';
@@ -291,14 +293,16 @@ THREE.PLYExporter.prototype = {
 		if ( includeIndices === true ) {
 
 			// faces
-			output +=
+			header +=
 				`element face ${faceCount}\n` +
 				'property list uchar int vertex_index\n';
 
 		}
 
-		output +=
-			'end_header\n' +
+		output += 'end_header\n';
+
+		var output =
+			header +
 			`${vertexList}\n` +
 			( includeIndices ? `${faceList}\n` : '' );
 
