@@ -63,7 +63,7 @@ THREE.PLYExporter.prototype = {
 					var colors = geometry.getAttribute( 'color' );
 					var indices = geometry.getIndex();
 
-					if ( vertices == null ) {
+					if ( vertices === undefined ) {
 
 						return;
 
@@ -72,11 +72,11 @@ THREE.PLYExporter.prototype = {
 					vertexCount += vertices.count;
 					faceCount += indices ? indices.count / 3 : vertices.count / 3;
 
-					if ( normals != null ) includeNormals = true;
+					if ( normals !== undefined ) includeNormals = true;
 
-					if ( uvs != null ) includeUVs = true;
+					if ( uvs !== undefined ) includeUVs = true;
 
-					if ( colors != null ) includeColors = true;
+					if ( colors !== undefined ) includeColors = true;
 
 				}
 
@@ -205,7 +205,7 @@ THREE.PLYExporter.prototype = {
 
 					normalMatrixWorld.getNormalMatrix( mesh.matrixWorld );
 
-					if ( vertices == null ) {
+					if ( vertices === undefined ) {
 
 						return;
 
