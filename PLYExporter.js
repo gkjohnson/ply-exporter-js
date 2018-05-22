@@ -184,18 +184,18 @@ THREE.PLYExporter.prototype = {
 		var normalMatrixWorld = new THREE.Matrix3();
 		object.traverse( function ( child ) {
 
-			if ( child instanceof THREE.Mesh ) {
+			if ( child.isMesh === true ) {
 
 				var mesh = child;
 				var geometry = mesh.geometry;
 
-				if ( geometry instanceof THREE.Geometry ) {
+				if ( geometry.isGeometry === true ) {
 
 					geometry = geomToBufferGeom.get( geometry );
 
 				}
 
-				if ( geometry instanceof THREE.BufferGeometry ) {
+				if ( geometry.isBufferGeometry === true ) {
 
 					var vertices = geometry.getAttribute( 'position' );
 					var normals = geometry.getAttribute( 'normal' );
