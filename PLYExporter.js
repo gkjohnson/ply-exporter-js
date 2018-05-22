@@ -43,16 +43,16 @@ THREE.PLYExporter.prototype = {
 							cb( mesh, geometry );
 
 						}
-				
-					}
-				
-				}
 
+					}
+
+				}
 
 			} );
 
 		}
 
+		// Default options
 		var defaultOptions = {
 			binary: false,
 			excludeProperties: [] // normal, uv, color, index
@@ -67,10 +67,10 @@ THREE.PLYExporter.prototype = {
 		var includeUVs = false;
 		var includeIndices = true;
 
-		// count the number of vertices
+		// count the vertices, check which properties are used,
+		// and cache the BufferGeometry
 		var vertexCount = 0;
 		var faceCount = 0;
-
 		object.traverse( function ( child ) {
 
 			if ( child.isMesh === true ) {
@@ -230,7 +230,7 @@ THREE.PLYExporter.prototype = {
 			var vOffset = headerBin.length;
 			var fOffset = headerBin.length + vertexListLength;
 			var writtenVertices = 0;
-			traverseMeshes( function ( mesh, geometry ) { 
+			traverseMeshes( function ( mesh, geometry ) {
 
 				var vertices = geometry.getAttribute( 'position' );
 				var normals = geometry.getAttribute( 'normal' );
@@ -409,7 +409,7 @@ THREE.PLYExporter.prototype = {
 			var vertexList = '';
 			var faceList = '';
 
-			traverseMeshes( function ( mesh, geometry ) { 
+			traverseMeshes( function ( mesh, geometry ) {
 
 				var vertices = geometry.getAttribute( 'position' );
 				var normals = geometry.getAttribute( 'normal' );
@@ -530,7 +530,9 @@ THREE.PLYExporter.prototype = {
 			} );
 
 			return `${ header }${vertexList}\n${ includeIndices ? `${faceList}\n` : '' }`;
+
 		}
+
 	}
 
 };
