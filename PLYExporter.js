@@ -173,165 +173,362 @@ THREE.PLYExporter.prototype = {
 
 		header += 'end_header\n';
 
+		function traverseMeshes( cb ) {
 
-		// count the number of vertices
-		// TODO: Handle the binary and ascii cases
-		var writtenVertices = 0;
-		var vertexList = '';
-		var faceList = '';
+			object.traverse( function ( child ) {
 
-		var vertex = new THREE.Vector3();
-		var normalMatrixWorld = new THREE.Matrix3();
-		object.traverse( function ( child ) {
+				if ( child.isMesh === true ) {
 
-			if ( child.isMesh === true ) {
+					var mesh = child;
+					var geometry = mesh.geometry;
 
-				var mesh = child;
-				var geometry = mesh.geometry;
+					if ( geometry.isGeometry === true ) {
 
-				if ( geometry.isGeometry === true ) {
+						geometry = geomToBufferGeom.get( geometry );
 
-					geometry = geomToBufferGeom.get( geometry );
+					}
 
+					if ( geometry.isBufferGeometry === true ) {
+
+						if ( geometry.getAttribute( 'position' ) !== undefined ) {
+
+							cb( mesh, geometry );
+
+						}
+				
+					}
+				
 				}
 
-				if ( geometry.isBufferGeometry === true ) {
 
-					var vertices = geometry.getAttribute( 'position' );
-					var normals = geometry.getAttribute( 'normal' );
-					var uvs = geometry.getAttribute( 'uv' );
-					var colors = geometry.getAttribute( 'color' );
-					var indices = geometry.getIndex();
+			} );
 
-					normalMatrixWorld.getNormalMatrix( mesh.matrixWorld );
+		}
 
-					if ( vertices === undefined ) {
+		// Generate attribute data
+		var vertex = new THREE.Vector3();
+		var normalMatrixWorld = new THREE.Matrix3();
 
-						return;
+		if ( options.binary === true ) {
+			var headerBin = new TextEncoder().encode( header );
 
-					}
+			// 3 position values at 4 bytes
+			// 3 normal values at 4 bytes
+			// 3 color channels with 1 byte
+			// 2 uv values at 4 bytes
+			var vertexListLength = vertexCount * ( 4 * 3 + ( includeNormals ? 4 * 3 : 0 ) + ( includeColors ? 3 : 0 ) + ( includeUVs ? 4 * 2 : 0 ) );
 
-					// form each line
-					for ( var i = 0, l = vertices.count; i < l; i ++ ) {
-
-						vertex.x = vertices.getX( i );
-						vertex.y = vertices.getY( i );
-						vertex.z = vertices.getZ( i );
-
-						vertex.applyMatrix4( mesh.matrixWorld );
+			// 1 byte shape desciptor
+			// 3 vertex indices at ${indexByteCount} bytes
+			var faceListLength = includeIndices ? faceCount * ( indexByteCount * 3 + 1 ) : 0;
+			var output = new DataView( new ArrayBuffer( headerBin.length + vertexListLength + faceListLength ) );
+			new Uint8Array( output.buffer ).set( headerBin, 0 );
 
 
-						// Position information
-						var line =
-							vertex.x + ' ' +
-							vertex.y + ' ' +
-							vertex.z;
+			var vOffset = headerBin.length;
+			var fOffset = headerBin.length + vertexListLength;
+			var writtenVertices = 0;
+			traverseMeshes( function ( mesh, geometry ) { 
 
-						// Normal information
-						if ( includeNormals === true ) {
+				var vertices = geometry.getAttribute( 'position' );
+				var normals = geometry.getAttribute( 'normal' );
+				var uvs = geometry.getAttribute( 'uv' );
+				var colors = geometry.getAttribute( 'color' );
+				var indices = geometry.getIndex();
 
-							if ( normals != null ) {
+				normalMatrixWorld.getNormalMatrix( mesh.matrixWorld );
 
-								vertex.x = normals.getX( i );
-								vertex.y = normals.getY( i );
-								vertex.z = normals.getZ( i );
+				for ( var i = 0, l = vertices.count; i < l; i ++ ) {
 
-								vertex.applyMatrix3( normalMatrixWorld );
+					vertex.x = vertices.getX( i );
+					vertex.y = vertices.getY( i );
+					vertex.z = vertices.getZ( i );
 
-								line += ' ' +
-									vertex.x + ' ' +
-									vertex.y + ' ' +
-									vertex.z;
+					vertex.applyMatrix4( mesh.matrixWorld );
 
-							} else {
 
-								line += ' 0 0 0';
+					// Position information
+					output.setFloat32( vOffset, vertex.x );
+					vOffset += 4;
 
-							}
+					output.setFloat32( vOffset, vertex.y );
+					vOffset += 4;
 
-						}
+					output.setFloat32( vOffset, vertex.z );
+					vOffset += 4;
 
-						// UV information
-						if ( includeUVs === true ) {
+					// Normal information
+					if ( includeNormals === true ) {
 
-							if ( uvs != null ) {
+						if ( normals != null ) {
 
-								line += ' ' +
-									uvs.getX( i ) + ' ' +
-									uvs.getY( i );
+							vertex.x = normals.getX( i );
+							vertex.y = normals.getY( i );
+							vertex.z = normals.getZ( i );
 
-							} else if ( includeUVs !== false ) {
+							vertex.applyMatrix3( normalMatrixWorld );
 
-								line += ' 0 0';
+							output.setFloat32( vOffset, vertex.x );
+							vOffset += 4;
 
-							}
+							output.setFloat32( vOffset, vertex.y );
+							vOffset += 4;
 
-						}
-
-						// Color information
-						if ( includeColors === true ) {
-
-							if ( colors != null ) {
-
-								line += ' ' +
-									Math.floor( colors.getX( i ) * 255 ) + ' ' +
-									Math.floor( colors.getY( i ) * 255 ) + ' ' +
-									Math.floor( colors.getZ( i ) * 255 );
-
-							} else {
-
-								line += ' 255 255 255';
-
-							}
-
-						}
-
-						vertexList += line + '\n';
-
-					}
-
-					// Create the face list
-					if ( includeIndices === true ) {
-
-						if ( indices !== null ) {
-
-							for ( var i = 0, l = indices.count; i < l; i += 3 ) {
-
-								faceList += `3 ${ indices.getX( i + 0 ) + writtenVertices }`;
-								faceList += ` ${ indices.getX( i + 1 ) + writtenVertices }`;
-								faceList += ` ${ indices.getX( i + 2 ) + writtenVertices }\n`;
-
-							}
+							output.setFloat32( vOffset, vertex.z );
+							vOffset += 4;
 
 						} else {
 
-							for ( var i = 0, l = vertices.count; i < l; i += 3 ) {
+							output.setFloat32( vOffset, 0 );
+							vOffset += 4;
 
-								faceList += `3 ${ writtenVertices + i } ${ writtenVertices + i + 1 } ${ writtenVertices + i + 2 }\n`;
+							output.setFloat32( vOffset, 0 );
+							vOffset += 4;
 
-							}
+							output.setFloat32( vOffset, 0 );
+							vOffset += 4;
 
 						}
 
-						faceCount += indices ? indices.count / 3 : vertices.count / 3;
+					}
+
+					// UV information
+					if ( includeUVs === true ) {
+
+						if ( uvs != null ) {
+
+							output.setFloat32( vOffset, uvs.getX( i ) );
+							vOffset += 4;
+
+							output.setFloat32( vOffset, uvs.getY( i ) );
+							vOffset += 4;
+
+						} else if ( includeUVs !== false ) {
+
+							output.setFloat32( vOffset, 0 );
+							vOffset += 4;
+
+							output.setFloat32( vOffset, 0 );
+							vOffset += 4;
+
+						}
 
 					}
 
-					writtenVertices += vertices.count;
+					// Color information
+					if ( includeColors === true ) {
+
+						if ( colors != null ) {
+
+							output.setUint8( vOffset, Math.floor( colors.getX( i ) * 255 ) );
+							vOffset += 1;
+
+							output.setUint8( vOffset, Math.floor( colors.getY( i ) * 255 ) );
+							vOffset += 1;
+
+							output.setUint8( vOffset, Math.floor( colors.getZ( i ) * 255 ) );
+							vOffset += 1;
+
+						} else {
+
+							output.setUint8( vOffset, 255 );
+							vOffset += 1;
+
+							output.setUint8( vOffset, 255 );
+							vOffset += 1;
+
+							output.setUint8( vOffset, 255 );
+							vOffset += 1;
+
+						}
+
+					}
 
 				}
 
-			}
+				if ( includeIndices === true ) {
 
-		} );
+					// Create the face list
+					var faceIndexFunc = `setUint${indexByteCount * 8}`;
+					if ( indices !== null ) {
 
-		var output =
-			header +
-			`${vertexList}\n` +
-			( includeIndices ? `${faceList}\n` : '' );
+						for ( var i = 0, l = indices.count; i < l; i += 3 ) {
 
-		return output;
+							output.setUint8( fOffset, 3 );
+							fOffset += 1;
 
+							output[ faceIndexFunc ]( fOffset, indices.getX( i + 0 ) + writtenVertices );
+							fOffset += indexByteCount;
+
+							output[ faceIndexFunc ]( fOffset, indices.getX( i + 1 ) + writtenVertices );
+							fOffset += indexByteCount;
+
+							output[ faceIndexFunc ]( fOffset, indices.getX( i + 2 ) + writtenVertices );
+							fOffset += indexByteCount;
+
+						}
+
+					} else {
+
+						for ( var i = 0, l = vertices.count; i < l; i += 3 ) {
+
+							output.setUint8( fOffset, 3 );
+							fOffset += 1;
+
+							output[ faceIndexFunc ]( fOffset, writtenVertices + i );
+							fOffset += indexByteCount;
+
+							output[ faceIndexFunc ]( fOffset, writtenVertices + i + 1 );
+							fOffset += indexByteCount;
+
+							output[ faceIndexFunc ]( fOffset, writtenVertices + i + 2 );
+							fOffset += indexByteCount;
+
+						}
+
+					}
+
+				}
+
+
+				// Save the amount of verts we've already written so we can offset
+				// the face index on the next mesh
+				writtenVertices += vertices.count;
+
+			} );
+
+			return output;
+
+		} else {
+
+			// Ascii Generation
+			// count the number of vertices
+			var writtenVertices = 0;
+			var vertexList = '';
+			var faceList = '';
+
+			traverseMeshes( function ( mesh, geometry ) { 
+
+				var vertices = geometry.getAttribute( 'position' );
+				var normals = geometry.getAttribute( 'normal' );
+				var uvs = geometry.getAttribute( 'uv' );
+				var colors = geometry.getAttribute( 'color' );
+				var indices = geometry.getIndex();
+
+				normalMatrixWorld.getNormalMatrix( mesh.matrixWorld );
+
+				// form each line
+				for ( var i = 0, l = vertices.count; i < l; i ++ ) {
+
+					vertex.x = vertices.getX( i );
+					vertex.y = vertices.getY( i );
+					vertex.z = vertices.getZ( i );
+
+					vertex.applyMatrix4( mesh.matrixWorld );
+
+
+					// Position information
+					var line =
+						vertex.x + ' ' +
+						vertex.y + ' ' +
+						vertex.z;
+
+					// Normal information
+					if ( includeNormals === true ) {
+
+						if ( normals != null ) {
+
+							vertex.x = normals.getX( i );
+							vertex.y = normals.getY( i );
+							vertex.z = normals.getZ( i );
+
+							vertex.applyMatrix3( normalMatrixWorld );
+
+							line += ' ' +
+								vertex.x + ' ' +
+								vertex.y + ' ' +
+								vertex.z;
+
+						} else {
+
+							line += ' 0 0 0';
+
+						}
+
+					}
+
+					// UV information
+					if ( includeUVs === true ) {
+
+						if ( uvs != null ) {
+
+							line += ' ' +
+								uvs.getX( i ) + ' ' +
+								uvs.getY( i );
+
+						} else if ( includeUVs !== false ) {
+
+							line += ' 0 0';
+
+						}
+
+					}
+
+					// Color information
+					if ( includeColors === true ) {
+
+						if ( colors != null ) {
+
+							line += ' ' +
+								Math.floor( colors.getX( i ) * 255 ) + ' ' +
+								Math.floor( colors.getY( i ) * 255 ) + ' ' +
+								Math.floor( colors.getZ( i ) * 255 );
+
+						} else {
+
+							line += ' 255 255 255';
+
+						}
+
+					}
+
+					vertexList += line + '\n';
+
+				}
+
+				// Create the face list
+				if ( includeIndices === true ) {
+
+					if ( indices !== null ) {
+
+						for ( var i = 0, l = indices.count; i < l; i += 3 ) {
+
+							faceList += `3 ${ indices.getX( i + 0 ) + writtenVertices }`;
+							faceList += ` ${ indices.getX( i + 1 ) + writtenVertices }`;
+							faceList += ` ${ indices.getX( i + 2 ) + writtenVertices }\n`;
+
+						}
+
+					} else {
+
+						for ( var i = 0, l = vertices.count; i < l; i += 3 ) {
+
+							faceList += `3 ${ writtenVertices + i } ${ writtenVertices + i + 1 } ${ writtenVertices + i + 2 }\n`;
+
+						}
+
+					}
+
+					faceCount += indices ? indices.count / 3 : vertices.count / 3;
+
+				}
+
+				writtenVertices += vertices.count;
+
+			} );
+
+			return `${ header }${vertexList}\n${ includeIndices ? `${faceList}\n` : '' }`;
+		}
 	}
 
 };
