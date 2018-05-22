@@ -22,6 +22,39 @@ THREE.PLYExporter.prototype = {
 
 	parse: function ( object, options ) {
 
+		// Iterate over the valid meshes in the object
+		function traverseMeshes( cb ) {
+
+			object.traverse( function ( child ) {
+
+				if ( child.isMesh === true ) {
+
+					var mesh = child;
+					var geometry = mesh.geometry;
+
+					if ( geometry.isGeometry === true ) {
+
+						geometry = geomToBufferGeom.get( geometry );
+
+					}
+
+					if ( geometry.isBufferGeometry === true ) {
+
+						if ( geometry.getAttribute( 'position' ) !== undefined ) {
+
+							cb( mesh, geometry );
+
+						}
+				
+					}
+				
+				}
+
+
+			} );
+
+		}
+
 		var defaultOptions = {
 			binary: false,
 			excludeProperties: []
@@ -42,12 +75,12 @@ THREE.PLYExporter.prototype = {
 
 		object.traverse( function ( child ) {
 
-			if ( child instanceof THREE.Mesh ) {
+			if ( child.isMesh === true ) {
 
 				var mesh = child;
 				var geometry = mesh.geometry;
 
-				if ( geometry instanceof THREE.Geometry ) {
+				if ( geometry.isGeometry === true ) {
 
 					var bufferGeometry = geomToBufferGeom.get( geometry ) || new THREE.BufferGeometry().setFromObject( mesh );
 					geomToBufferGeom.set( geometry, bufferGeometry );
@@ -55,7 +88,7 @@ THREE.PLYExporter.prototype = {
 
 				}
 
-				if ( geometry instanceof THREE.BufferGeometry ) {
+				if ( geometry.isBufferGeometry === true ) {
 
 					var vertices = geometry.getAttribute( 'position' );
 					var normals = geometry.getAttribute( 'normal' );
@@ -173,43 +206,14 @@ THREE.PLYExporter.prototype = {
 
 		header += 'end_header\n';
 
-		function traverseMeshes( cb ) {
-
-			object.traverse( function ( child ) {
-
-				if ( child.isMesh === true ) {
-
-					var mesh = child;
-					var geometry = mesh.geometry;
-
-					if ( geometry.isGeometry === true ) {
-
-						geometry = geomToBufferGeom.get( geometry );
-
-					}
-
-					if ( geometry.isBufferGeometry === true ) {
-
-						if ( geometry.getAttribute( 'position' ) !== undefined ) {
-
-							cb( mesh, geometry );
-
-						}
-				
-					}
-				
-				}
-
-
-			} );
-
-		}
 
 		// Generate attribute data
 		var vertex = new THREE.Vector3();
 		var normalMatrixWorld = new THREE.Matrix3();
 
 		if ( options.binary === true ) {
+
+			// Binary File Generation
 			var headerBin = new TextEncoder().encode( header );
 
 			// 3 position values at 4 bytes
@@ -401,7 +405,7 @@ THREE.PLYExporter.prototype = {
 
 		} else {
 
-			// Ascii Generation
+			// Ascii File Generation
 			// count the number of vertices
 			var writtenVertices = 0;
 			var vertexList = '';
