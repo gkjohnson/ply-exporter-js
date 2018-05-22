@@ -5,10 +5,8 @@
  * Usage:
  *  var exporter = new THREE.PLYExporter();
  *
- *  // second argument is an array of attributes to
- *  // explicitly exclude from the file:
- *  // 'color', 'uv', 'normal', 'index'
- *  var data = exporter.parse(mesh, [ 'color' ]);
+ *  // second argument is a list of options
+ *  var data = exporter.parse(mesh, { binar: true, excludeProperties: [ 'color' ] });
  *
  * Format Definition:
  *  http://paulbourke.net/dataformats/ply/
@@ -57,7 +55,7 @@ THREE.PLYExporter.prototype = {
 
 		var defaultOptions = {
 			binary: false,
-			excludeProperties: []
+			excludeProperties: [] // normal, uv, color, index
 		};
 
 		options = Object.assign( defaultOptions, options );
