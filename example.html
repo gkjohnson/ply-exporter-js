@@ -4,9 +4,6 @@
     <script type="text/javascript" src="./node_modules/three/build/three.min.js"></script>
     <script type="text/javascript" src="./node_modules/three/examples/js/loaders/PLYLoader.js"></script>
     <script type="text/javascript" src="./PLYExporter.js"></script>
-    <script type="text/javascript" src="./PLYBinaryExporter.js"></script>
-
-
 
     <title></title>
 </head>
@@ -52,8 +49,7 @@
 
 
         // process into the Binary file format
-        var binexp = new THREE.PLYBinaryExporter();
-        var bindata = binexp.parse(mesh);
+        var bindata = exp.parse(mesh, { binary: true });
 
         console.log('Binary Format', { data: new TextDecoder().decode(bindata) });
 

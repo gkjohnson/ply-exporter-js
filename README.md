@@ -19,18 +19,28 @@ var exporter = new THREE.PLYExporter();
 // and geometry within
 var data = exporter.parse(mesh);
 
-// Optionally exclude certain fields
-var dataNoColors = exporter.parse(mesh, ['color']);
+// Optionally exclude certain fields and
+// export as a binary file
+var dataNoColors = exporter.parse(mesh, { binary: true, excludeAttributes: ['color'] });
 
 // save the file!
 ```
 
-#### PLYExporter.parse(object, excludedAttributes)
-#### PLYBinaryExporter.parse(object, excludedAttributes)
+### PLYExporter.parse(object, options)
 
 The exporter only includes the properties present on the mesh being exported. So if there are no vertex colors or uvs, then those are not included in the final file. If multiple meshes are included in the exported object, then data will be generated for meshes that do not have a property required for others. If no normal, uv, or color data is present, then an "empty" default is used. `0 0 0` for normals, `0 0` for uvs, and `255 255 255` for colors. Triangle indices are included unless explicitly excluded.
 
-To exclude an attribute from being saved, pass it in in the `excludedAttributes` array. This works with the values `'color'`, `'normal'`, `'uv'`, and `'index'`. Exclude `'index'` to export a point mesh.
+#### options.excludeAttributes
+
+Pass an attribute into the `excludeAttributes` array to exclude it from being included in the file. This works with the values `'color'`, `'normal'`, `'uv'`, and `'index'`. Exclude `'index'` to export a point mesh.
+
+Defaults to an empty array.
+
+#### options.binary
+
+Set to `true` out output the file as a binary format.
+
+Defaults to `false`.
 
 ## Limitations
 
