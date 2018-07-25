@@ -21,22 +21,28 @@ var data = exporter.parse(mesh);
 
 // Optionally exclude certain fields and
 // export as a binary file
-var dataNoColors = exporter.parse(mesh, { binary: true, excludeAttributes: ['color'] });
-
-// save the file!
+var dataNoColors = exporter.parse(mesh, data => { /* save the file! */ }, { binary: true, excludeAttributes: ['color'] });
 ```
 
-### PLYExporter.parse(object, options)
+### PLYExporter.parse(object, onDone, options)
 
 The exporter only includes the properties present on the mesh being exported. So if there are no vertex colors or uvs, then those are not included in the final file. If multiple meshes are included in the exported object, then data will be generated for meshes that do not have a property required for others. If no normal, uv, or color data is present, then an "empty" default is used. `0 0 0` for normals, `0 0` for uvs, and `255 255 255` for colors. Triangle indices are included unless explicitly excluded.
 
-#### options.excludeAttributes
+#### object
+The object to export as a PLY file.
+
+#### onDone
+
+An optional callback for when the model has completed being processed. The same data is returned from the function.
+
+#### options
+##### options.excludeAttributes
 
 Pass an attribute into the `excludeAttributes` array to exclude it from being included in the file. This works with the values `'color'`, `'normal'`, `'uv'`, and `'index'`. Exclude `'index'` to export a point mesh.
 
 Defaults to an empty array.
 
-#### options.binary
+##### options.binary
 
 Set to `true` out output the file as a binary format.
 
