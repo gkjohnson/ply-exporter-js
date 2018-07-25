@@ -45,7 +45,8 @@
         console.log(geometry.attributes.position.array.join(',') === res.attributes.position.array.join(','));
         console.log(geometry.attributes.normal.array.join(',') === res.attributes.normal.array.join(','));
         console.log(!geometry.attributes.color && !res.attributes.color);
-
+        console.log(res instanceof Object);
+        // saveData(bindata, 'ascii-example.ply')
 
 
         // process into the Binary file format
@@ -54,11 +55,13 @@
         console.log('Binary Format', { data: new TextDecoder().decode(bindata) });
 
         // parse it back to geometry and compare
-        var binres = loader.parse(bindata.buffer);
+        var binres = loader.parse(bindata);
         console.log(geometry.index.array.join(',') === binres.index.array.join(','));
         console.log(geometry.attributes.position.array.join(',') === binres.attributes.position.array.join(','));
         console.log(geometry.attributes.normal.array.join(',') === binres.attributes.normal.array.join(','));
         console.log(!geometry.attributes.color && !binres.attributes.color);
+        console.log(bindata instanceof ArrayBuffer);
+        // saveData(bindata, 'bin-example.ply')
 
     </script>
 </body>

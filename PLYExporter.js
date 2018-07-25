@@ -399,7 +399,7 @@ THREE.PLYExporter.prototype = {
 
 			} );
 
-			return output;
+			return output.buffer;
 
 		} else {
 
