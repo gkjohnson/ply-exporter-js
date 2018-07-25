@@ -50,7 +50,7 @@
 
 
         // process into the Binary file format
-        var bindata = exp.parse(mesh, { binary: true });
+        var bindata = exp.parse(mesh, null, { binary: true });
 
         console.log('Binary Format', { data: new TextDecoder().decode(bindata) });
 
