@@ -2,7 +2,10 @@
   "name": "ply-exporter",
   "version": "1.1.0",
   "description": "PLY geometry format exporter for THREE js",
-  "main": "PLYExporter.js",
+	"main": "PLYExporter.js",
+	"files": [
+		"PLYExporter.js"
+	],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
