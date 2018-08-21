@@ -1,6 +1,7 @@
 # PLY Exporter
 
-[![npm version](https://badge.fury.io/js/ply-exporter.svg)](https://www.npmjs.com/package/ply-exporter)
+[![npm version](https://img.shields.io/npm/v/ply-exporter.svg?style=flat-square)](https://www.npmjs.com/package/ply-exporter)
+[![lgtm code quality](https://img.shields.io/lgtm/grade/javascript/g/gkjohnson/ply-exporter-js.svg?style=flat-square&label=code-quality)](https://lgtm.com/projects/g/gkjohnson/ply-exporter-js/)
 
 PLY / Stanford Triangle Format exporter for THREE js geometry that supports both ascii and binary little endian formats. Format described [here](http://paulbourke.net/dataformats/ply/).
 
